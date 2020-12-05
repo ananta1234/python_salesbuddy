@@ -38,6 +38,16 @@ def getToken(user):
         token = None
     return token
 
+#User click logout button
+@app.route('/logout', methods=['GET', 'POST'])
+def logout():
+    try:
+        auth.current_user = None
+        return render_template('login.html')
+    except Exception as e:
+        print(e)
+        return {'message': 'Error signing out'},400
+
 @app.route('/', methods=["GET", "POST"])
 def index():
 
@@ -69,13 +79,14 @@ def index():
             except Exception as e:
                 return {'message': 'Error signing user up'},400
 
-        if request.form['action'] == 'Log Out':
-            try:
-                auth.current_user = None
-                return {'message': 'Successfully signed out!'}
-            except Exception as e:
-                print(e)
-                return {'message': 'Error signing out'},400
+        # On page logging out function
+        # if request.form['action'] == 'Log Out':
+        #     try:
+        #         auth.current_user = None
+        #         return {'message': 'Successfully signed out!'}
+        #     except Exception as e:
+        #         print(e)
+        #         return {'message': 'Error signing out'},400
 
 
 
@@ -125,6 +136,9 @@ def index():
 
   #Display entries currently in database
   user = getUser()
+  token = getToken(user)
+
+
   tup_output = []
 
   try:
@@ -145,4 +159,9 @@ def index():
     print(e)
     past_queries = None
 
-  return render_template('index.html', queries=tup_output)
+  if token is None:
+    return render_template('login.html')
+  else:
+    return render_template('index.html', queries=tup_output)
+
+
